@@ -20,9 +20,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
     "paths": {
+      "components/*": ["components/*"],
       "pages/*": ["pages/*"],
       "utils/*": ["utils/*"],
+      "styles/*": ["styles/*"]
     }
   },
   "include": ["src"]
