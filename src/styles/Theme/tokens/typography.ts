@@ -37,19 +37,19 @@ const TYPOGRAPHY = Object.freeze({
   title1: css`
     font-size: 20px;
     font-weight: 600;
-    line-height: 135%;
+    line-height: 140%;
   `,
 
   title2: css`
     font-size: 18px;
     font-weight: 600;
-    line-height: 135%;
+    line-height: 140%;
   `,
 
   title3: css`
     font-size: 16px;
     font-weight: 600;
-    line-height: 135%;
+    line-height: 140%;
   `,
 
   // Body font styles
