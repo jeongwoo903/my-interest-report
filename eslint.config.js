@@ -52,6 +52,7 @@ export default tseslint.config(
       'import/no-named-as-default': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      'eol-last': ['error', 'always'],
     },
     settings: {
       react: {
