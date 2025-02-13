@@ -90,6 +90,7 @@ export const resetCss = css`
     font-size: 100%;
     vertical-align: baseline;
   }
+
   article,
   aside,
   details,
@@ -103,17 +104,21 @@ export const resetCss = css`
   section {
     display: block;
   }
+
   body {
     line-height: 1;
   }
+
   ol,
   ul {
     list-style: none;
   }
+
   blockquote,
   q {
     quotes: none;
   }
+
   blockquote:before,
   blockquote:after,
   q:before,
@@ -121,19 +126,24 @@ export const resetCss = css`
     content: '';
     content: none;
   }
+
   button {
     border: none;
     cursor: pointer;
     background-color: unset;
+    padding: 0;
   }
+
   a {
     text-decoration: none;
     cursor: pointer;
   }
+
   table {
     border-collapse: collapse;
     border-spacing: 0;
   }
+
   svg,
   img {
     vertical-align: top;
