@@ -1,5 +1,6 @@
 import { css, Theme } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
+import Header from 'components/Header.tsx';
 // import { scan } from 'react-scan';
 
 // /** 개발용 react-scan 세팅 */
@@ -12,24 +13,25 @@ import { Outlet } from 'react-router-dom';
 
 export default function Layout() {
   return (
-    <section css={mainCss}>
-      <main css={mainContentCss}>
+    <section css={layoutCss}>
+      <Header title={'📑 나의 관심사 분석기'} />
+      <main css={mainCss}>
         <Outlet />
       </main>
     </section>
   );
 }
 
-const mainCss = (theme: Theme) => css`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const layoutCss = (theme: Theme) => css`
+  ${theme.common.flex_center};
+  flex-direction: column;
   width: 100%;
   height: 100dvh;
   background-color: ${theme.color.background};
 `;
 
-const mainContentCss = (theme: Theme) => css`
-  ${theme.layout.main};
-  background-color: white;
+const mainCss = (theme: Theme) => css`
+  width: 100%;
+  height: 100%;
+  background-color: ${theme.color.white};
 `;
