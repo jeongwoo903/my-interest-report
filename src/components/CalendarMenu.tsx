@@ -1,6 +1,5 @@
 import { css, Theme } from '@emotion/react';
 import { useState } from 'react';
-import THEME from 'styles/Theme/tokens/theme.ts';
 
 interface CalendarMenuProps {
   isOpen: boolean;
@@ -21,7 +20,7 @@ export default function CalendarMenu({ isOpen }: CalendarMenuProps) {
   }
 
   return (
-    <div css={CalendarMenuCss(isOpen, THEME)}>
+    <div css={theme => CalendarMenuCss(isOpen, theme)}>
       <input type="date" value={startDate} onChange={e => handleStartDate(e.target.value)} />
       <input type="date" value={endDate} onChange={e => handleEndDate(e.target.value)} />
     </div>
