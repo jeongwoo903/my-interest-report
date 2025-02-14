@@ -1,6 +1,6 @@
 const COLOR = Object.freeze({
   primary: '#079CF9',
-  background: '#F4F5FA',
+  dragOver: '#e0f2ff',
   boxShadow: '#0000003F',
   white: '#FFFFFF',
   black: '#12161A',

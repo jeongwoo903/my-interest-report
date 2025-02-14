@@ -27,7 +27,6 @@ const layoutCss = (theme: Theme) => css`
   flex-direction: column;
   width: 100%;
   height: 100dvh;
-  background-color: ${theme.color.background};
 `;
 
 const mainCss = (theme: Theme) => css`

@@ -104,14 +104,20 @@ export default function Home() {
     }
   }
 
-  // 렌더링
+  // 파일 미러 클릭
   function fileInputMirrorClick() {
     fileInputRef.current?.click();
   }
 
+  // 파일 state에 따른 렌더링 변화
   function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
     const hasFile = file !== null && file !== undefined;
     return hasFile ? uploadedMessage : defaultMessage;
+  }
+
+  // 드래그 앤 드롭된 파일을 state에 저장
+  function handleFileDrop(droppedFile: File) {
+    setFile(droppedFile);
   }
 
   return (
@@ -124,7 +130,7 @@ export default function Home() {
 
         <Space size={60} />
 
-        <FileUpload>
+        <FileUpload onFileDrop={handleFileDrop}>
           <UploadIcon />
           <div css={FileUploadDescCss}>
             <p>
@@ -156,9 +162,6 @@ export default function Home() {
             분석하기
           </Button>
         </div>
-
-        {/*<input type="date" value={startDate} onChange={e => handleStartDate(e.target.value)} />*/}
-        {/*<input type="date" value={endDate} onChange={e => handleEndDate(e.target.value)} />*/}
       </div>
     </div>
   );
