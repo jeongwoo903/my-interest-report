@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { ChangeEvent, useState, useRef } from 'react';
+import { ChangeEvent, useState, useRef, useReducer, useEffect, useId } from 'react';
 import OpenAI from 'openai';
 import { css, Theme } from '@emotion/react';
 import SectionHeader from 'components/SectionHeader.tsx';
@@ -7,7 +7,10 @@ import FileUpload from 'components/FileUpload.tsx';
 import Button from 'components/Button.tsx';
 import UploadIcon from 'assets/svg/upload-icon.svg?react';
 import Space from 'components/Space.tsx';
-import Calendar from 'components/Calendar.tsx';
+import Calendar from 'components/Calendar/Calendar.tsx';
+import CalendarButton from 'components/Calendar/CalendarButton.tsx';
+import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
+import DateButton from 'components/Calendar/DateButton.tsx';
 
 interface JsonDataProps {
   Date: Date;
@@ -43,7 +46,20 @@ function extractLinksByDate(jsonData: JsonDataProps[]): JsonDataProps[] {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [data, setData] = useState<string>('');
+  const [isOpen, toggleIsOpen] = useReducer(state => {
+    return !state;
+  }, false);
+  const [date, setDate] = useState<string>('이번 달');
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const dates = [
+    { value: '올해' },
+    { value: '지난 6개월' },
+    { value: '지난 3개월' },
+    { value: '이번 달' },
+    { value: '오늘' },
+  ];
 
   function changeFile(event: ChangeEvent<HTMLInputElement>) {
     const selectedFile = getFile(event);
@@ -157,7 +173,25 @@ export default function Home() {
         <Space size={12} />
 
         <div css={toolsCss}>
-          <Calendar />
+          <Calendar>
+            <CalendarButton clickEvent={toggleIsOpen} />
+            <CalendarMenu isOpen={isOpen}>
+              {dates.map(({ value }) => (
+                <DateButton
+                  key={useId()}
+                  value={value}
+                  isSelected={date === value}
+                  onClick={() => {
+                    setDate(value);
+                    toggleIsOpen();
+                  }}
+                >
+                  {value}
+                </DateButton>
+              ))}
+            </CalendarMenu>
+          </Calendar>
+
           <Button onClick={handleParse} disabled={!file}>
             분석하기
           </Button>
