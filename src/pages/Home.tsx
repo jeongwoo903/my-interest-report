@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useRef } from 'react';
 import OpenAI from 'openai';
 import { css, Theme } from '@emotion/react';
 import SectionHeader from 'components/SectionHeader.tsx';
@@ -43,6 +43,7 @@ function extractLinksByDate(jsonData: JsonDataProps[]): JsonDataProps[] {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [data, setData] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function changeFile(event: ChangeEvent<HTMLInputElement>) {
     const selectedFile = getFile(event);
@@ -103,6 +104,16 @@ export default function Home() {
     }
   }
 
+  // 렌더링
+  function fileInputMirrorClick() {
+    fileInputRef.current?.click();
+  }
+
+  function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
+    const hasFile = file !== null && file !== undefined;
+    return hasFile ? uploadedMessage : defaultMessage;
+  }
+
   return (
     <div css={contentCss}>
       <div>
@@ -110,15 +121,35 @@ export default function Home() {
           title={'📑 나의 관심사 분석기'}
           desc={'카카오톡 나의 채팅방에 저장해둔 링크들을 분석해드립니다!'}
         />
+
         <Space size={60} />
+
         <FileUpload>
           <UploadIcon />
-          <p css={FileUploadDescCss}>여기에 채팅 파일을 끌어다 놓거나 업로드 해주세요.</p>
+          <div css={FileUploadDescCss}>
+            <p>
+              {renderMessageByFile(
+                '여기에 채팅 파일을 끌어다 놓거나 업로드 해주세요.',
+                `파일: ${file?.name}`,
+              )}
+            </p>
+          </div>
           <Space size={35} />
-          <Button>파일 업로드</Button>
+          <Button onClick={fileInputMirrorClick}>
+            {renderMessageByFile('파일 업로드', '파일 재업로드')}
+          </Button>
+          <input
+            css={FileInputCss}
+            ref={fileInputRef}
+            type="file"
+            accept=".csv, .xlsx"
+            onChange={changeFile}
+          />
           <Space size={45} />
         </FileUpload>
+
         <Space size={12} />
+
         <div css={toolsCss}>
           <Calendar />
           <Button onClick={handleParse} disabled={!file}>
@@ -128,7 +159,6 @@ export default function Home() {
 
         {/*<input type="date" value={startDate} onChange={e => handleStartDate(e.target.value)} />*/}
         {/*<input type="date" value={endDate} onChange={e => handleEndDate(e.target.value)} />*/}
-        {/*<input type="file" accept=".csv, .xlsx" onChange={changeFile} />*/}
       </div>
     </div>
   );
@@ -138,10 +168,27 @@ const contentCss = (theme: Theme) => css`
   ${theme.common.flex_center};
   height: 100%;
   margin: 0 auto;
+
+  > div {
+    padding: 0 1rem;
+    transform: translateY(-${theme.layout.header_height});
+  }
 `;
 
 const FileUploadDescCss = (theme: Theme) => css`
   color: ${theme.color.subText};
+
+  > p {
+    width: 400px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const FileInputCss = () => css`
+  display: none;
 `;
 
 const toolsCss = () => css`
