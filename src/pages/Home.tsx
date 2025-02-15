@@ -1,7 +1,6 @@
-import * as XLSX from 'xlsx';
-import { ChangeEvent, useState, useRef, useReducer, useEffect, useId } from 'react';
-import OpenAI from 'openai';
+import { useState, useReducer, useId } from 'react';
 import { css, Theme } from '@emotion/react';
+import { isEqual } from 'lodash';
 import SectionHeader from 'components/SectionHeader.tsx';
 import FileUpload from 'components/FileUpload.tsx';
 import Button from 'components/Button.tsx';
@@ -11,97 +10,47 @@ import Calendar from 'components/Calendar/Calendar.tsx';
 import CalendarButton from 'components/Calendar/CalendarButton.tsx';
 import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
 import DateButton from 'components/Calendar/DateButton.tsx';
+import formatDate from 'utils/date.ts';
+import { ExcelToJson, extractLinksByDate } from 'utils/excelUtils.ts';
+import { useFileUpload } from 'hooks/useFileUpload.ts';
 
-interface JsonDataProps {
-  Date: Date;
-  Message: string | null;
-  User: string;
+interface ResultDataProps {
+  total: number;
+  success: number;
+  failure: number;
+  list: ListProps[];
 }
 
-function getFile(event: ChangeEvent<HTMLInputElement>): File | null {
-  return event.target.files?.[0] ?? null;
-}
-
-async function ExcelToJson(file: File): Promise<JsonDataProps[]> {
-  const arrayBuffer = await file.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
-  const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-
-  const firstSheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[firstSheetName];
-
-  let jsonData: JsonDataProps[] = XLSX.utils.sheet_to_json(sheet);
-  return jsonData;
-}
-
-function extractLinksByDate(jsonData: JsonDataProps[]): JsonDataProps[] {
-  return jsonData.filter(item => {
-    return (
-      typeof item.Message === 'string' &&
-      (item.Message.startsWith('https') || item.Message.startsWith('http'))
-    );
-  });
+interface ListProps {
+  content: string;
+  hashtags: string[];
+  status: 'success' | 'failure';
+  title: string;
+  url: string;
 }
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState<string>('');
+  const { year, month, day, getXMonthsAgo } = formatDate();
+  const { file, fileInputRef, uploadFile, fileInputMirrorClick } = useFileUpload();
+  const [data, setData] = useState<string | null>(null);
+  /** Default: 이번 달 */
+  const [date, setDate] = useState<string[]>([`${year}-${month}-01`, `${year}-${month}-${day}`]);
   const [isOpen, toggleIsOpen] = useReducer(state => {
     return !state;
   }, false);
-  const [date, setDate] = useState<string>('이번 달');
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dates = [
-    { value: '올해' },
-    { value: '지난 6개월' },
-    { value: '지난 3개월' },
-    { value: '이번 달' },
-    { value: '오늘' },
+    { label: '올해', value: [`${year}-01-01`, `${year}-${month}-${day}`] },
+    { label: '지난 12개월', value: [getXMonthsAgo(12), `${year}-${month}-${day}`] },
+    { label: '지난 6개월', value: [getXMonthsAgo(6), `${year}-${month}-${day}`] },
+    { label: '지난 3개월', value: [getXMonthsAgo(3), `${year}-${month}-${day}`] },
+    { label: '이번 달', value: [`${year}-${month}-01`, `${year}-${month}-${day}`] },
+    { label: '오늘', value: [`${year}-${month}-${day}`, `${year}-${month}-${day}`] },
   ];
-
-  function changeFile(event: ChangeEvent<HTMLInputElement>) {
-    const selectedFile = getFile(event);
-    setFile(selectedFile);
-  }
 
   async function parseExcelFile(file: File) {
     if (!file) throw new Error('파일이 없습니다.');
     return await ExcelToJson(file);
-  }
-
-  function formatLinks(jsonData: JsonDataProps[]) {
-    const linkData = extractLinksByDate(jsonData);
-    return linkData.map(item => `Link: ${item.Message}`).join('\n');
-  }
-
-  async function analyzeLinksWithOpenAI(formattedLinks) {
-    const openai = new OpenAI({
-      apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: '너는 유능한 데이터 분석가야. 데이터들을 관심사별로 알맞게 분석하는 역할을 해.',
-        },
-        {
-          role: 'user',
-          content: `
-        해당 데이터는 사용자가 공유한 링크 목록이야. \n 
-        각 목록들을 관심사 별로 구별해서 분류해줘. \n 
-        응답은 json 형식으로 data를 category, count, links 형태로 각각 묶어서 전달해줘.
-        데이터: ${formattedLinks}`,
-        },
-      ],
-      temperature: 0.5,
-    });
-
-    return response.choices[0].message.content;
   }
 
   async function handleParse() {
@@ -109,31 +58,27 @@ export default function Home() {
       if (!file) return;
 
       const jsonData = await parseExcelFile(file);
-      const formattedLinks = formatLinks(jsonData);
-      console.log(formattedLinks);
+      const linkData = extractLinksByDate(jsonData, date);
 
-      const analysisResult = await analyzeLinksWithOpenAI(formattedLinks);
-      setData(analysisResult);
-      console.log(analysisResult);
+      const response = await fetch('http://localhost:3000/api/urls/process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(linkData),
+      });
+
+      const data = await response.json();
+      setData(data);
     } catch (error) {
       console.error('Error:', error);
     }
-  }
-
-  // 파일 미러 클릭
-  function fileInputMirrorClick() {
-    fileInputRef.current?.click();
   }
 
   // 파일 state에 따른 렌더링 변화
   function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
     const hasFile = file !== null && file !== undefined;
     return hasFile ? uploadedMessage : defaultMessage;
-  }
-
-  // 드래그 앤 드롭된 파일을 state에 저장
-  function handleFileDrop(droppedFile: File) {
-    setFile(droppedFile);
   }
 
   return (
@@ -146,7 +91,7 @@ export default function Home() {
 
         <Space size={60} />
 
-        <FileUpload onFileDrop={handleFileDrop}>
+        <FileUpload onFileDrop={uploadFile}>
           <UploadIcon />
           <div css={FileUploadDescCss}>
             <p>
@@ -165,7 +110,7 @@ export default function Home() {
             ref={fileInputRef}
             type="file"
             accept=".csv, .xlsx"
-            onChange={changeFile}
+            onChange={uploadFile}
           />
           <Space size={45} />
         </FileUpload>
@@ -176,17 +121,17 @@ export default function Home() {
           <Calendar>
             <CalendarButton clickEvent={toggleIsOpen} />
             <CalendarMenu isOpen={isOpen}>
-              {dates.map(({ value }) => (
+              {dates.map(({ label, value }) => (
                 <DateButton
                   key={useId()}
                   value={value}
-                  isSelected={date === value}
+                  isSelected={isEqual(date, value)}
                   onClick={() => {
                     setDate(value);
                     toggleIsOpen();
                   }}
                 >
-                  {value}
+                  {label}
                 </DateButton>
               ))}
             </CalendarMenu>

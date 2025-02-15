@@ -1,38 +1,39 @@
-import { useState } from 'react';
+import { DragEvent, useState } from 'react';
+import { UploadFileEventType } from 'components/FileUpload.tsx';
 
 interface UseFileDropProps {
-  onFileDrop?: (file: File) => void;
+  onFileDrop: (event: UploadFileEventType) => void;
 }
 
 export function useFileDrop({ onFileDrop }: UseFileDropProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
-      if (checkValidExtension(droppedFile) && onFileDrop) {
-        onFileDrop(droppedFile);
+      if (checkValidExtension(droppedFile)) {
+        onFileDrop(e);
       }
     }
   };

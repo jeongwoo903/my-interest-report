@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { css, Theme } from '@emotion/react';
 import { useFileDrop } from 'hooks/useFileDrop.ts';
+import { DragEvent, ChangeEvent } from 'react';
+
+export type UploadFileEventType = DragEvent<HTMLDivElement> | ChangeEvent<HTMLInputElement>;
 
 interface FileUploadProps {
   children: React.ReactNode;
-  onFileDrop?: (file: File) => void;
+  onFileDrop: (event: UploadFileEventType) => void;
 }
 
 export default function FileUpload({ children, onFileDrop }: FileUploadProps) {
