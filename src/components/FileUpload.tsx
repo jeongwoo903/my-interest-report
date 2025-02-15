@@ -40,7 +40,7 @@ const UploadCard = (theme: Theme, isDragOver: boolean) => css`
   border: 1px dashed ${isDragOver ? theme.color.primary : theme.color.border};
   border-radius: 8px;
 
-  > div,
+  > p,
   > svg {
     pointer-events: none;
   }

@@ -3,7 +3,7 @@ import { css, Theme } from '@emotion/react';
 
 interface DateButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  value: string;
+  value: string[];
   isSelected: boolean;
 }
 
