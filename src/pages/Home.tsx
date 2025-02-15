@@ -11,28 +11,14 @@ import CalendarButton from 'components/Calendar/CalendarButton.tsx';
 import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
 import DateButton from 'components/Calendar/DateButton.tsx';
 import formatDate from 'utils/date.ts';
-import { ExcelToJson, extractLinksByDate } from 'utils/excelUtils.ts';
+import { extractLinksByDate } from 'utils/excelUtils.ts';
 import { useFileUpload } from 'hooks/useFileUpload.ts';
-
-interface ResultDataProps {
-  total: number;
-  success: number;
-  failure: number;
-  list: ListProps[];
-}
-
-interface ListProps {
-  content: string;
-  hashtags: string[];
-  status: 'success' | 'failure';
-  title: string;
-  url: string;
-}
+import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
 
 export default function Home() {
   const { year, month, day, getXMonthsAgo } = formatDate();
-  const { file, fileInputRef, uploadFile, fileInputMirrorClick } = useFileUpload();
-  const [data, setData] = useState<string | null>(null);
+  const { file, fileInputRef, uploadFile, parseExcelFile, fileInputMirrorClick } = useFileUpload();
+  const [result, setResult] = useState<ResultDataProps | null>(null);
   /** Default: 이번 달 */
   const [date, setDate] = useState<string[]>([`${year}-${month}-01`, `${year}-${month}-${day}`]);
   const [isOpen, toggleIsOpen] = useReducer(state => {
@@ -48,37 +34,25 @@ export default function Home() {
     { label: '오늘', value: [`${year}-${month}-${day}`, `${year}-${month}-${day}`] },
   ];
 
-  async function parseExcelFile(file: File) {
-    if (!file) throw new Error('파일이 없습니다.');
-    return await ExcelToJson(file);
+  // 파일 state에 따른 렌더링 변화
+  function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
+    const hasFile = file !== null && file !== undefined;
+    return hasFile ? uploadedMessage : defaultMessage;
   }
 
-  async function handleParse() {
+  // 데이터 분석
+  async function analyzeData() {
     try {
       if (!file) return;
 
       const jsonData = await parseExcelFile(file);
       const linkData = extractLinksByDate(jsonData, date);
+      const result = await getResultData(linkData);
 
-      const response = await fetch('http://localhost:3000/api/urls/process', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(linkData),
-      });
-
-      const data = await response.json();
-      setData(data);
+      setResult(result);
     } catch (error) {
       console.error('Error:', error);
     }
-  }
-
-  // 파일 state에 따른 렌더링 변화
-  function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
-    const hasFile = file !== null && file !== undefined;
-    return hasFile ? uploadedMessage : defaultMessage;
   }
 
   return (
@@ -93,14 +67,12 @@ export default function Home() {
 
         <FileUpload onFileDrop={uploadFile}>
           <UploadIcon />
-          <div css={FileUploadDescCss}>
-            <p>
-              {renderMessageByFile(
-                '여기에 채팅 파일을 끌어다 놓거나 업로드 해주세요.',
-                `파일: ${file?.name}`,
-              )}
-            </p>
-          </div>
+          <p css={FileUploadDescCss}>
+            {renderMessageByFile(
+              '여기에 채팅 파일을 끌어다 놓거나 업로드 해주세요.',
+              `파일: ${file?.name}`,
+            )}
+          </p>
           <Space size={35} />
           <Button onClick={fileInputMirrorClick}>
             {renderMessageByFile('파일 업로드', '파일 재업로드')}
@@ -137,7 +109,7 @@ export default function Home() {
             </CalendarMenu>
           </Calendar>
 
-          <Button onClick={handleParse} disabled={!file}>
+          <Button onClick={analyzeData} disabled={!file}>
             분석하기
           </Button>
         </div>
@@ -159,14 +131,11 @@ const contentCss = (theme: Theme) => css`
 
 const FileUploadDescCss = (theme: Theme) => css`
   color: ${theme.color.subText};
-
-  > p {
-    width: 400px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  width: 400px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const FileInputCss = () => css`
