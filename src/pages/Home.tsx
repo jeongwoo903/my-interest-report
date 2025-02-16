@@ -1,4 +1,4 @@
-import { useState, useReducer, useId } from 'react';
+import { useState, useReducer, useId, useRef } from 'react';
 import { css, Theme } from '@emotion/react';
 import { isEqual } from 'lodash';
 import SectionHeader from 'components/SectionHeader.tsx';
@@ -14,6 +14,7 @@ import { getCurrentDate, getXMonthsAgo } from 'utils/date.ts';
 import { extractLinksByDate } from 'utils/excelUtils.ts';
 import { useFileUpload } from 'hooks/useFileUpload.ts';
 import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
+import { useClickOutside } from 'hooks/useClickOutside.ts';
 
 export default function Home() {
   const { year, month, day } = getCurrentDate();
@@ -24,6 +25,7 @@ export default function Home() {
   const [isOpen, toggleIsOpen] = useReducer(state => {
     return !state;
   }, false);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   const dates = [
     { label: '올해', value: [`${year}-01-01`, `${year}-${month}-${day}`] },
@@ -33,6 +35,12 @@ export default function Home() {
     { label: '이번 달', value: [`${year}-${month}-01`, `${year}-${month}-${day}`] },
     { label: '오늘', value: [`${year}-${month}-${day}`, `${year}-${month}-${day}`] },
   ];
+
+  useClickOutside(calendarRef, () => {
+    if (isOpen) {
+      toggleIsOpen();
+    }
+  });
 
   // 파일 state에 따른 렌더링 변화
   function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
@@ -89,7 +97,7 @@ export default function Home() {
 
         <Space size={12} />
 
-        <div css={toolsCss}>
+        <div css={toolsCss} ref={calendarRef}>
           <Calendar>
             <CalendarButton clickEvent={toggleIsOpen} />
             <CalendarMenu isOpen={isOpen}>
@@ -100,7 +108,6 @@ export default function Home() {
                   isSelected={isEqual(date, value)}
                   onClick={() => {
                     setDate(value);
-                    toggleIsOpen();
                   }}
                 >
                   {label}
@@ -146,4 +153,9 @@ const toolsCss = () => css`
   display: flex;
   justify-content: end;
   gap: 14px;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
 `;
