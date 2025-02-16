@@ -10,13 +10,13 @@ import Calendar from 'components/Calendar/Calendar.tsx';
 import CalendarButton from 'components/Calendar/CalendarButton.tsx';
 import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
 import DateButton from 'components/Calendar/DateButton.tsx';
-import formatDate from 'utils/date.ts';
+import { getCurrentDate, getXMonthsAgo } from 'utils/date.ts';
 import { extractLinksByDate } from 'utils/excelUtils.ts';
 import { useFileUpload } from 'hooks/useFileUpload.ts';
 import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
 
 export default function Home() {
-  const { year, month, day, getXMonthsAgo } = formatDate();
+  const { year, month, day } = getCurrentDate();
   const { file, fileInputRef, uploadFile, parseExcelFile, fileInputMirrorClick } = useFileUpload();
   const [result, setResult] = useState<ResultDataProps | null>(null);
   /** Default: 이번 달 */

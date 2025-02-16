@@ -1,21 +1,17 @@
-export default function formatDate() {
+import { format, subMonths } from 'date-fns';
+
+export const getXMonthsAgo = (months: number) => {
+  return format(subMonths(new Date(), months), 'yyyy-MM-dd');
+};
+
+export const formatYYYYMMDD = (date: Date) => {
+  return format(date, 'yyyy.MM.dd');
+};
+
+export const getCurrentDate = () => {
   const now = new Date();
   const year = String(now.getFullYear());
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-
-  const getXMonthsAgo = (months: number) => {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - months);
-    return date.toISOString().slice(0, 10);
-  };
-
-  const formatYYYYMMDD = (date: Date) => {
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}.${month}.${day}`;
-  };
-
-  return { year, month, day, getXMonthsAgo, formatYYYYMMDD };
-}
+  return { year, month, day };
+};
