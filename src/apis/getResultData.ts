@@ -1,4 +1,5 @@
 import { JsonDataProps } from 'utils/excelUtils.ts';
+import { api } from 'apis/index.ts';
 
 export interface ResultDataProps {
   total: number;
@@ -16,11 +17,9 @@ interface ListProps {
 }
 
 export async function getResultData(linkData: JsonDataProps[]): Promise<ResultDataProps> {
-  const response = await fetch('http://localhost:3000/api/analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await api.post<ResultDataProps>('/api/analyze', {
     body: JSON.stringify(linkData),
   });
 
-  return await response.json();
+  return response;
 }
