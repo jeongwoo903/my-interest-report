@@ -1,4 +1,4 @@
-import { JsonDataProps } from 'utils/excelUtils.ts';
+import { JsonDataProps } from 'utils/excelToJson.ts';
 import { api } from 'apis/index.ts';
 
 export interface ResultDataProps {

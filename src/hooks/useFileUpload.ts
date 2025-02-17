@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { UploadFileEventType } from 'components/FileUpload.tsx';
-import { ExcelToJson } from 'utils/excelUtils.ts';
+import { excelToJson } from 'utils/excelToJson.ts';
 
 export function useFileUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -8,7 +8,7 @@ export function useFileUpload() {
 
   async function parseExcelFile(file: File) {
     if (!file) throw new Error('파일이 없습니다.');
-    return await ExcelToJson(file);
+    return await excelToJson(file);
   }
 
   function getFile(event: UploadFileEventType): File | null {
