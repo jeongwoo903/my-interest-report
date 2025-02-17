@@ -40,10 +40,19 @@
       ],
       "assets/*": [
         "assets/*"
+      ],
+      "hooks/*": [
+        "hooks/*"
+      ],
+      "apis/*": [
+        "apis/*"
       ]
     }
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/setupProxy.ts"
   ]
 }

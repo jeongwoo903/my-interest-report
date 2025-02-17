@@ -1,6 +1,5 @@
 import { css, Theme } from '@emotion/react';
 import { ButtonHTMLAttributes, ReactNode } from 'react';
-import THEME from 'styles/Theme/tokens/theme.ts';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -9,7 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export default function Button({ children, disabled = false, ...rest }: ButtonProps) {
   return (
-    <button css={buttonCss(disabled, THEME)} {...rest}>
+    <button css={theme => buttonCss(disabled, theme)} {...rest}>
       {children}
     </button>
   );

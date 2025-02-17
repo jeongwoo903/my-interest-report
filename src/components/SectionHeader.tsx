@@ -17,9 +17,10 @@ export default function SectionHeader({ title, desc }: TitleProps) {
 const titleCss = (theme: Theme) => css`
   display: flex;
   flex-direction: column;
-  gap: 16px;
   align-items: center;
+  gap: 16px;
   width: 100%;
+  text-align: center;
 
   > h1 {
     ${theme.typography.display2};

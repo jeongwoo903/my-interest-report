@@ -17,7 +17,6 @@ export default function Header({ title }: HeaderProps) {
 const headerCss = (theme: Theme) => css`
   background-color: ${theme.color.white};
   width: 100%;
-  height: 57px;
   box-shadow: 0 1px 1px ${theme.color.boxShadow};
   z-index: 20;
 `;
@@ -25,7 +24,7 @@ const headerCss = (theme: Theme) => css`
 const containerCss = (theme: Theme) => css`
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.875rem 1rem;
   margin: 0 auto;
   max-width: ${theme.layout.header_width};
   height: 100%;
