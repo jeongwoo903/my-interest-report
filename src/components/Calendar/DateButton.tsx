@@ -1,13 +1,18 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { css, Theme } from '@emotion/react';
+import { DateRange, isDateFormat } from 'utils/date.ts';
 
 interface DateButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  value: string[];
+  value: DateRange;
   isSelected: boolean;
 }
 
 export default function DateButton({ children, value, isSelected, ...props }: DateButtonProps) {
+  if (!isDateFormat(value[0]) || !isDateFormat(value[1])) {
+    throw new Error('올바르지 않은 날짜 포맷입니다. YYYY-MM-DD 형식을 사용해 주세요.');
+  }
+
   return (
     <button css={theme => DateButtonCss(theme, isSelected)} {...props}>
       {children}

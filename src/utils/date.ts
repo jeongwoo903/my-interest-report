@@ -1,4 +1,6 @@
-import { format, subMonths } from 'date-fns';
+import { format, isValid, parse, subMonths } from 'date-fns';
+
+export type DateRange = [string, string];
 
 export const getXMonthsAgo = (months: number) => {
   return format(subMonths(new Date(), months), 'yyyy-MM-dd');
@@ -6,6 +8,11 @@ export const getXMonthsAgo = (months: number) => {
 
 export const formatYYYYMMDD = (date: Date) => {
   return format(date, 'yyyy.MM.dd');
+};
+
+export const isDateFormat = (date: string, format: string = 'yyyy-MM-dd'): boolean => {
+  const parsedDate = parse(date, format, new Date());
+  return isValid(parsedDate);
 };
 
 export const getCurrentDate = () => {

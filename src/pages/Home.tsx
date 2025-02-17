@@ -10,24 +10,24 @@ import Calendar from 'components/Calendar/Calendar.tsx';
 import CalendarButton from 'components/Calendar/CalendarButton.tsx';
 import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
 import DateButton from 'components/Calendar/DateButton.tsx';
-import { getCurrentDate, getXMonthsAgo } from 'utils/date.ts';
-import { extractLinksByDate } from 'utils/excelUtils.ts';
+import { DateRange, getCurrentDate, getXMonthsAgo } from 'utils/date.ts';
 import { useFileUpload } from 'hooks/useFileUpload.ts';
 import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
 import { useClickOutside } from 'hooks/useClickOutside.ts';
+import { extractLinksByDate } from 'utils/extractLinkByDate.ts';
 
 export default function Home() {
   const { year, month, day } = getCurrentDate();
   const { file, fileInputRef, uploadFile, parseExcelFile, fileInputMirrorClick } = useFileUpload();
   const [result, setResult] = useState<ResultDataProps | null>(null);
   /** Default: 이번 달 */
-  const [date, setDate] = useState<string[]>([`${year}-${month}-01`, `${year}-${month}-${day}`]);
+  const [date, setDate] = useState<DateRange>([`${year}-${month}-01`, `${year}-${month}-${day}`]);
   const [isOpen, toggleIsOpen] = useReducer(state => {
     return !state;
   }, false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const dates = [
+  const dates: { label: string; value: DateRange }[] = [
     { label: '올해', value: [`${year}-01-01`, `${year}-${month}-${day}`] },
     { label: '지난 12개월', value: [getXMonthsAgo(12), `${year}-${month}-${day}`] },
     { label: '지난 6개월', value: [getXMonthsAgo(6), `${year}-${month}-${day}`] },
