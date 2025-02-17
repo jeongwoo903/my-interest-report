@@ -30,12 +30,23 @@ export function useFileDrop({ onFileDrop }: UseFileDropProps) {
     e.stopPropagation();
     setIsDragOver(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (checkValidExtension(droppedFile)) {
-        onFileDrop(e);
-      }
+    const files = e.dataTransfer.files;
+
+    if (!files.length) return;
+
+    if (files.length > 1) {
+      alert('한 번에 하나의 파일만 업로드할 수 있습니다.');
+      return;
     }
+
+    const droppedFile = files[0];
+
+    if (!checkValidExtension(droppedFile)) {
+      alert('지원하지 않는 파일 형식입니다. xlsx 또는 csv 파일만 허용됩니다.');
+      return;
+    }
+
+    onFileDrop(e);
   };
 
   function checkValidExtension(file: File) {
