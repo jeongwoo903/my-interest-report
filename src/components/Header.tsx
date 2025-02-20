@@ -1,14 +1,19 @@
 import { css, Theme } from '@emotion/react';
+import { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
-  title: string;
+  children: ReactNode;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({ children }: HeaderProps) {
+  const navigate = useNavigate();
   return (
     <header css={headerCss}>
       <div css={containerCss}>
-        <h3 css={titleCss}>{title}</h3>
+        <h3 css={titleCss} onClick={() => navigate('/')}>
+          {children}
+        </h3>
       </div>
     </header>
   );
@@ -32,4 +37,5 @@ const containerCss = (theme: Theme) => css`
 
 const titleCss = (theme: Theme) => css`
   ${theme.typography.title1}
+  cursor: pointer;
 `;

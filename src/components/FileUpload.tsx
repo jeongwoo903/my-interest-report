@@ -7,7 +7,7 @@ export type UploadFileEventType = DragEvent<HTMLDivElement> | ChangeEvent<HTMLIn
 
 interface FileUploadProps {
   children: React.ReactNode;
-  onFileDrop: (event: UploadFileEventType) => void;
+  onFileDrop: (e: UploadFileEventType) => void;
 }
 
 export default function FileUpload({ children, onFileDrop }: FileUploadProps) {

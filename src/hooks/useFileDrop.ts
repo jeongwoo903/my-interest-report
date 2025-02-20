@@ -2,7 +2,7 @@ import { DragEvent, useState } from 'react';
 import { UploadFileEventType } from 'components/FileUpload.tsx';
 
 interface UseFileDropProps {
-  onFileDrop: (event: UploadFileEventType) => void;
+  onFileDrop: (e: UploadFileEventType) => void;
 }
 
 export function useFileDrop({ onFileDrop }: UseFileDropProps) {

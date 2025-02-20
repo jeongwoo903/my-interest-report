@@ -1,9 +1,12 @@
-import { useState, useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { UploadFileEventType } from 'components/FileUpload.tsx';
 import { excelToJson } from 'utils/excelToJson.ts';
+import { FileContext, FileSetContext } from 'contexts/FileContext.tsx';
 
 export function useFileUpload() {
-  const [file, setFile] = useState<File | null>(null);
+  const file = useContext(FileContext);
+  const setFile = useContext(FileSetContext);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function parseExcelFile(file: File) {
