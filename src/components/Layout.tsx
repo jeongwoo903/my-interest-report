@@ -14,7 +14,7 @@ import Header from 'components/Header.tsx';
 export default function Layout() {
   return (
     <section css={layoutCss}>
-      <Header title={'📑 나의 관심사 분석기'} />
+      <Header>📑 나의 관심사 분석기</Header>
       <main css={mainCss}>
         <Outlet />
       </main>
@@ -26,7 +26,6 @@ const layoutCss = (theme: Theme) => css`
   ${theme.common.flex_center};
   flex-direction: column;
   width: 100%;
-  height: 100dvh;
 `;
 
 const mainCss = (theme: Theme) => css`

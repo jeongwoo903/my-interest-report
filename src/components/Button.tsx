@@ -8,7 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export default function Button({ children, disabled = false, ...rest }: ButtonProps) {
   return (
-    <button css={theme => buttonCss(disabled, theme)} {...rest}>
+    <button css={theme => buttonCss(disabled, theme)} disabled={disabled} {...rest}>
       {children}
     </button>
   );

@@ -6,6 +6,9 @@ const COLOR = Object.freeze({
   black: '#12161A',
   subText: '#808080',
   border: '#B9B9B9',
+  failure: '#FF5050',
+  success: '#079CF9',
+  total: '#505050',
 });
 
 export default COLOR;

@@ -1,14 +1,20 @@
 import { css, Theme } from '@emotion/react';
+import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
-  title: string;
+  children: ReactNode;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({ children }: HeaderProps) {
   return (
     <header css={headerCss}>
       <div css={containerCss}>
-        <h3 css={titleCss}>{title}</h3>
+        <h3 css={titleCss}>
+          <Link to="/" aria-label="홈으로 이동">
+            {children}
+          </Link>
+        </h3>
       </div>
     </header>
   );
@@ -31,5 +37,10 @@ const containerCss = (theme: Theme) => css`
 `;
 
 const titleCss = (theme: Theme) => css`
-  ${theme.typography.title1}
+  ${theme.typography.title1};
+  cursor: pointer;
+
+  > a {
+    color: ${theme.color.black};
+  }
 `;

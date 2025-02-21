@@ -46,6 +46,9 @@
       ],
       "apis/*": [
         "apis/*"
+      ],
+      "contexts/*": [
+        "contexts/*"
       ]
     }
   },
