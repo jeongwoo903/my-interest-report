@@ -12,19 +12,22 @@ import CalendarMenu from 'components/Calendar/CalendarMenu.tsx';
 import DateButton from 'components/Calendar/DateButton.tsx';
 import { DateRange, getCurrentDate, getXMonthsAgo } from 'utils/date.ts';
 import { useFileUpload } from 'hooks/useFileUpload.ts';
-import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
 import { useClickOutside } from 'hooks/useClickOutside.ts';
-import { extractLinksByDate } from 'utils/extractLinkByDate.ts';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
-  const { year, month, day } = getCurrentDate();
-  const { file, fileInputRef, uploadFile, parseExcelFile, fileInputMirrorClick } = useFileUpload();
-  const [result, setResult] = useState<ResultDataProps | null>(null);
+  const navigate = useNavigate();
+
+  const { file, fileInputRef, uploadFile, fileInputMirrorClick } = useFileUpload();
+
   /** Default: 이번 달 */
+  const { year, month, day } = getCurrentDate();
   const [date, setDate] = useState<DateRange>([`${year}-${month}-01`, `${year}-${month}-${day}`]);
+
   const [isOpen, toggleIsOpen] = useReducer(state => {
     return !state;
   }, false);
+
   const calendarRef = useRef<HTMLDivElement>(null);
 
   const dates: { label: string; value: DateRange }[] = [
@@ -42,26 +45,15 @@ export default function Home() {
     }
   });
 
-  // 파일 state에 따른 렌더링 변화
   function renderMessageByFile(defaultMessage: string, uploadedMessage: string) {
     const hasFile = file !== null && file !== undefined;
     return hasFile ? uploadedMessage : defaultMessage;
   }
 
-  // 데이터 분석
-  async function analyzeData() {
-    try {
-      if (!file) return;
-
-      const jsonData = await parseExcelFile(file);
-      const linkData = extractLinksByDate(jsonData, date);
-      const result = await getResultData(linkData);
-
-      setResult(result);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
+  const goResultPage = () => {
+    const encodedDate = encodeURIComponent(JSON.stringify(date));
+    navigate(`/result?date=${encodedDate}`);
+  };
 
   return (
     <div css={contentCss}>
@@ -116,7 +108,7 @@ export default function Home() {
             </CalendarMenu>
           </Calendar>
 
-          <Button onClick={analyzeData} disabled={!file}>
+          <Button onClick={goResultPage} disabled={!file}>
             분석하기
           </Button>
         </div>
@@ -127,7 +119,7 @@ export default function Home() {
 
 const contentCss = (theme: Theme) => css`
   ${theme.common.flex_center};
-  height: 100%;
+  height: 100dvh;
   margin: 0 auto;
 
   > div {
