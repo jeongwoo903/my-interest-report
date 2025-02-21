@@ -16,7 +16,7 @@ export interface ItemProps {
   date: Date;
   status: 'success' | 'failure';
   content?: string;
-  thumbnail?: any;
+  thumbnail?: string;
 }
 
 export async function getResultData(linkData: JsonDataProps[]): Promise<ResultDataProps> {
