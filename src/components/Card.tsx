@@ -51,11 +51,18 @@ export default function Card({ item }: CardProps) {
 
   return (
     <div css={cardCss}>
-      <a css={thumbnailCss} href={item.url} target="_blank" rel="noopener noreferrer">
+      <a
+        css={thumbnailCss}
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${item.title} 상세 페이지로 이동`}
+      >
         <img
           src={item.thumbnail || CardErrorImage}
-          alt={item.title + '썸네일'}
+          alt={`${item.title} 관련 이미지`}
           onError={e => (e.currentTarget.src = CardErrorImage)}
+          loading="lazy"
         />
       </a>
       <div css={textCardCss}>
