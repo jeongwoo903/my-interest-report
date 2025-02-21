@@ -15,7 +15,7 @@ import Card from 'components/Card.tsx';
 export default function Result() {
   const { file, parseExcelFile } = useFileUpload();
   const [result, setResult] = useState<ResultDataProps | null>(null);
-  const [activeTag, setActiveTag] = useState<string>('All');
+  const [activeTag, setActiveTag] = useState<string>('ALL');
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -67,7 +67,7 @@ export default function Result() {
       .sort((a, b) => b.count - a.count);
 
     const totalCount = sortedList.reduce((sum, item) => sum + item.count, 0);
-    return [{ title: 'All', count: totalCount }, ...sortedList];
+    return [{ title: 'ALL', count: totalCount }, ...sortedList];
   }, [tagMap]);
 
   return (
@@ -104,7 +104,13 @@ export default function Result() {
       <Space size={20} />
       <div css={CardWrapperCss}>
         {result?.list?.map((item, index) => {
-          return <Card key={index} item={item} />;
+          const isVisible = activeTag === 'ALL' || item.tags.includes(activeTag);
+
+          if (isVisible) {
+            return <Card key={index} item={item} />;
+          }
+
+          return null;
         })}
       </div>
 

@@ -9,7 +9,12 @@ export interface TagProps {
 
 export default function Tag({ title, count, isActive = false, onClick }: TagProps) {
   return (
-    <button css={theme => TagCss(theme, isActive)} onClick={onClick}>
+    <button
+      css={theme => TagCss(theme, isActive)}
+      onClick={onClick}
+      aria-pressed={isActive}
+      role="switch"
+    >
       {title} ({count})
     </button>
   );
