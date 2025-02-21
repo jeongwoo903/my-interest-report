@@ -3,12 +3,52 @@ import { formatYYYYMMDD } from 'utils/date.ts';
 import { css, Theme } from '@emotion/react';
 import CardErrorImage from 'assets/img/card-error-image.jpg';
 import Hashtag from 'components/Hashtag.tsx';
+// import { useEffect, useState } from 'react';
+// import Resizer from 'react-image-file-resizer';
 
 interface CardProps {
   item: ItemProps;
 }
 
 export default function Card({ item }: CardProps) {
+  // const [webpThumbnail, setWebpThumbnail] = useState<string>(CardErrorImage);
+  //
+  // useEffect(() => {
+  //   async function createWebpImage() {
+  //     if (!item.thumbnail) {
+  //       setWebpThumbnail(CardErrorImage);
+  //       return;
+  //     }
+  //
+  //     try {
+  //       const response = await fetch(item.thumbnail);
+  //       const blob = await response.blob();
+  //       const file = new File([blob], 'thumbnail', { type: blob.type });
+  //
+  //       Resizer.imageFileResizer(
+  //         file,
+  //         300, // 가로 최대 사이즈(px)
+  //         160, // 세로 최대 사이즈(px)
+  //         'WEBP', // 변환 포맷
+  //         100, // 품질(0~100)
+  //         0, // 회전 각도
+  //         uri => {
+  //           if (typeof uri === 'string') {
+  //             setWebpThumbnail(uri);
+  //           } else {
+  //             setWebpThumbnail(CardErrorImage);
+  //           }
+  //         },
+  //         'base64',
+  //       );
+  //     } catch (error) {
+  //       setWebpThumbnail(CardErrorImage);
+  //     }
+  //   }
+  //
+  //   createWebpImage();
+  // }, [item.thumbnail]);
+
   return (
     <div css={cardCss}>
       <a css={thumbnailCss} href={item.url} target="_blank" rel="noopener noreferrer">
