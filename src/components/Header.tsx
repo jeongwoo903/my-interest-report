@@ -1,18 +1,19 @@
 import { css, Theme } from '@emotion/react';
 import { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   children: ReactNode;
 }
 
 export default function Header({ children }: HeaderProps) {
-  const navigate = useNavigate();
   return (
     <header css={headerCss}>
       <div css={containerCss}>
-        <h3 css={titleCss} onClick={() => navigate('/')}>
-          {children}
+        <h3 css={titleCss}>
+          <Link to="/" aria-label="홈으로 이동">
+            {children}
+          </Link>
         </h3>
       </div>
     </header>
@@ -36,6 +37,10 @@ const containerCss = (theme: Theme) => css`
 `;
 
 const titleCss = (theme: Theme) => css`
-  ${theme.typography.title1}
+  ${theme.typography.title1};
   cursor: pointer;
+
+  > a {
+    color: ${theme.color.black};
+  }
 `;
