@@ -1,15 +1,6 @@
 import { css, Theme } from '@emotion/react';
 import { Outlet } from 'react-router-dom';
 import Header from 'components/Header.tsx';
-// import { scan } from 'react-scan';
-
-// /** 개발용 react-scan 세팅 */
-// if (typeof window !== 'undefined') {
-//   scan({
-//     enabled: true,
-//     log: true, // logs render info to console (default: false)
-//   });
-// }
 
 export default function Layout() {
   return (
