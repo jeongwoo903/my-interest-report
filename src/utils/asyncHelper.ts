@@ -1,29 +1,22 @@
-export function getStatusChecker<T>(promiseIn: Promise<T>) {
+export function wrapPromise<T>(promise: Promise<T>) {
   let status = 'pending';
   let result: T;
-  let error: Error;
-
-  const promise = promiseIn
-    .then(response => {
+  let suspender = promise.then(
+    r => {
       status = 'success';
-      result = response;
-    })
-    .catch(err => {
+      result = r;
+    },
+    e => {
       status = 'error';
-      error = err;
-    });
+      result = e;
+    },
+  );
 
-  return () => ({ promise, status, result, error });
-}
-
-export function makeThrower<T>(promiseIn: Promise<T>) {
-  const checkStatus = getStatusChecker(promiseIn);
-
-  return function () {
-    const { promise, status, result, error } = checkStatus();
-
-    if (status === 'pending') throw promise;
-    if (status === 'error') throw error;
-    return result;
+  return {
+    read() {
+      if (status === 'pending') throw suspender;
+      if (status === 'error') throw result;
+      return result;
+    },
   };
 }
