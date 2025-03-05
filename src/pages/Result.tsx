@@ -1,22 +1,20 @@
-import { extractLinksByDate } from 'utils/extractLinkByDate.ts';
-import { loadResultData, ResultDataProps } from 'apis/getResultData.ts';
-import { useFileUpload } from 'hooks/useFileUpload.ts';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useFileUpload } from 'hooks/useFileUpload.ts';
 import SectionHeader from 'components/SectionHeader.tsx';
 import Space from 'components/Space.tsx';
 import SummaryBoard from 'components/SummaryBoard/SummaryBoard.tsx';
-import { SummaryItemProps } from 'components/SummaryBoard/SummaryItem.tsx';
 import theme from 'styles/Theme/tokens/theme.ts';
 import { css } from '@emotion/react';
-import Tag, { TagProps } from 'components/Tag.tsx';
+import Tag from 'components/Tag.tsx';
 import Card from 'components/Card.tsx';
+import { getResultData, ResultDataProps } from 'apis/getResultData.ts';
+import { extractLinksByDate } from 'utils/extractLinkByDate.ts';
+import { wrapPromise } from 'utils/asyncHelper.ts';
+import ResultContentLoading from 'components/ResultContentLoading.tsx';
 
 export default function Result() {
   const { file, parseExcelFile } = useFileUpload();
-  const [result, setResult] = useState<ResultDataProps | null>(null);
-  const [activeTag, setActiveTag] = useState<string>('ALL');
-
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const date = useMemo(() => {
@@ -24,44 +22,62 @@ export default function Result() {
     return encodedDate ? JSON.parse(decodeURIComponent(encodedDate)) : null;
   }, [location.search]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!file || !date) return;
+  async function parseFile(file: File) {
+    return parseExcelFile(file);
+  }
 
-        const jsonData = await parseExcelFile(file);
-        const linkData = extractLinksByDate(jsonData, date);
+  async function filterDataByDate(file: File, date: any) {
+    const jsonData = await parseFile(file);
+    return extractLinksByDate(jsonData, date);
+  }
 
-        const resultData = loadResultData(linkData);
-        setResult(resultData);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    })();
-  }, [file]);
+  async function getFinalResult(file: File, date: any) {
+    const linkData = await filterDataByDate(file, date);
+    return getResultData(linkData);
+  }
 
-  const summaryBoardData: SummaryItemProps[] = useMemo(
-    () => [
-      { label: '조회된 링크 수', count: result?.total, color: theme.color.total },
-      { label: '분석된 링크 수', count: result?.success, color: theme.color.success },
-      { label: '실패한 링크 수', count: result?.failure, color: theme.color.failure },
-    ],
-    [result],
+  function fetchResult(file: File, date: any) {
+    return wrapPromise(getFinalResult(file, date));
+  }
+
+  // Suspense 데이터 호출
+  if (!file || !date) throw new Error('잘못된 방식으로 접근하셨습니다!');
+  const resultData = fetchResult(file, date);
+
+  return (
+    <>
+      <Suspense fallback={<ResultContentLoading />}>
+        <ResultContent resultData={resultData} />
+      </Suspense>
+    </>
   );
+}
 
-  const tagMap: Map<string, number> = useMemo(() => {
+interface ResultContentProps {
+  resultData: { read(): ResultDataProps };
+}
+
+// 데이터가 로드된 후 렌더링할 컴포넌트
+function ResultContent({ resultData }: ResultContentProps) {
+  const result = resultData.read();
+
+  const summaryBoardData = [
+    { label: '조회된 링크 수', count: result?.total, color: theme.color.total },
+    { label: '분석된 링크 수', count: result?.success, color: theme.color.success },
+    { label: '실패한 링크 수', count: result?.failure, color: theme.color.failure },
+  ];
+
+  const tagMap = useMemo(() => {
     const map = new Map();
-
     result?.list.forEach(item => {
       item.tags.forEach(tag => {
         map.set(tag, (map.get(tag) || 0) + 1);
       });
     });
-
     return map;
   }, [result]);
 
-  const tagList: TagProps[] = useMemo(() => {
+  const tagList = useMemo(() => {
     const sortedList = [...tagMap.entries()]
       .map(([title, count]) => ({ title, count }))
       .sort((a, b) => b.count - a.count);
@@ -71,7 +87,7 @@ export default function Result() {
   }, [tagMap]);
 
   return (
-    <>
+    <div>
       <Space size={50} />
 
       <SectionHeader
@@ -84,38 +100,20 @@ export default function Result() {
       <div css={SummaryBoardWrapperCss}>
         <SummaryBoard data={summaryBoardData} />
       </div>
-
       <Space size={40} />
 
       <div css={tagWrapperCss}>
-        {tagList.map((item, index) => {
-          return (
-            <Tag
-              key={index}
-              title={item.title}
-              count={item.count}
-              isActive={activeTag === item.title}
-              onClick={() => setActiveTag(item.title)}
-            />
-          );
-        })}
+        {tagList.map((item, index) => (
+          <Tag key={index} title={item.title} count={item.count} />
+        ))}
       </div>
-
       <Space size={20} />
+
       <div css={CardWrapperCss}>
-        {result?.list?.map((item, index) => {
-          const isVisible = activeTag === 'ALL' || item.tags.includes(activeTag);
-
-          if (isVisible) {
-            return <Card key={index} item={item} />;
-          }
-
-          return null;
-        })}
+        {result?.list?.map((item, index) => <Card key={index} item={item} />)}
       </div>
-
       <Space size={40} />
-    </>
+    </div>
   );
 }
 

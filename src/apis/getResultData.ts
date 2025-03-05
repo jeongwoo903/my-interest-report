@@ -1,6 +1,5 @@
 import { JsonDataProps } from 'utils/excelToJson.ts';
 import { api } from 'apis/index.ts';
-import { makeThrower } from 'utils/asyncHelper.ts';
 
 export interface ResultDataProps {
   total: number;
@@ -25,9 +24,4 @@ export async function getResultData(linkData: JsonDataProps[]): Promise<ResultDa
   });
 
   return response;
-}
-
-export function loadResultData(linkData: JsonDataProps[]) {
-  const promise = getResultData(linkData);
-  return makeThrower<ResultDataProps>(promise);
 }
