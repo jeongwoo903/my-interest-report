@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
-
   const { file, fileInputRef, uploadFile, fileInputMirrorClick } = useFileUpload();
 
   /** Default: 이번 달 */
@@ -119,12 +118,11 @@ export default function Home() {
 
 const contentCss = (theme: Theme) => css`
   ${theme.common.flex_center};
-  height: 100dvh;
+  height: calc(100dvh - ${theme.layout.header_height});
   margin: 0 auto;
 
   > div {
     padding: 0 1rem;
-    transform: translateY(-${theme.layout.header_height});
   }
 `;
 

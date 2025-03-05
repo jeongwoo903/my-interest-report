@@ -48,7 +48,6 @@ export default function Card({ item }: CardProps) {
   //
   //   createWebpImage();
   // }, [item.thumbnail]);
-
   return (
     <div css={cardCss}>
       <a
@@ -94,10 +93,11 @@ const cardCss = (theme: Theme) => css`
   box-shadow: 0 0 4px ${theme.color.boxShadow};
 `;
 
-const thumbnailCss = css`
+const thumbnailCss = (theme: Theme) => css`
   width: inherit;
   height: 160px;
   overflow: hidden;
+  background-color: ${theme.color.thumbnail};
 
   > img {
     width: 100%;
@@ -115,6 +115,7 @@ const textCardCss = (theme: Theme) => css`
   gap: 10px;
   padding: 1.25rem;
   background-color: ${theme.color.white};
+  box-shadow: 0 1px 4px ${theme.color.cardContentShadow} inset;
 `;
 
 const detailAnchorCss = css`
